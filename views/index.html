@@ -1,4 +1,5 @@
 <html>
+
 <head>
   <title>Transparent Login Form with Bootstrap 4</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
@@ -9,26 +10,32 @@
   <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
+
 <body>
   <div class="modal-dialog text-center">
     <div class="col-sm-8 main-section">
-      <div class="modal-content">
+      <div class="login-form">
 
-        <div class="col-12 user-img">
-          <img src="medias/logo.png" alt="Logo">
+        <div class="modal-content">
+
+          <div class="col-12 user-img">
+            <img src="medias/logo.png" alt="Logo">
+          </div>
+
+          <form class="col-12" action="index.html" method="post">
+            <div class="form-group">
+              <input type="email" name="loginEmail" placeholder="Adresse e-mail">
+            </div>
+            <div class="form-group">
+              <input type="password" name="loginPassword" placeholder="Mot de passe">
+            </div>
+            <button type="submit" class="btn" name="loginButton"><i class="fas fa-sign-in-alt"></i>S'authentifier</button>
+            <p id="newUser">Vous êtes nouveau? Rejoignez-nous <a href="register.ejs">ici</a></p>
+          </form>
+
         </div>
-
-        <form class="col-12" action="index.html" method="post">
-          <div class="form-group">
-            <input type="email" name="loginEmail" placeholder="Adresse e-mail">
-          </div>
-          <div class="form-group">
-            <input type="password" name="loginPassword" placeholder="Mot de passe">
-          </div>
-          <button type="submit" class="btn" name="loginButton"><i class="fas fa-sign-in-alt"></i>S'authentifier</button>
-        </form>
-
-      </div> <!--- Fin card -->
+      </div>
+      <!--- Fin card -->
     </div>
   </div>
 
@@ -41,4 +48,5 @@
 
 
 </body>
+
 </html>

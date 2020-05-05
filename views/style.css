@@ -1,5 +1,11 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans');
 
+:root{
+  --first-color: #fbc303;
+  --second-color: #3d3d3d;
+  --third-color: #f68a0d;
+}
+
 body{
   font-family: 'Open Sans', sans-serif;
   background: url(medias/background.jpg) no-repeat center center fixed;
@@ -13,10 +19,10 @@ body{
 }
 
 .modal-content{
-  background-color: #3d3d3d;
+  background-color: var(--second-color);
   opacity: .92;
   padding: 0 18px;
-  box-shadow: 0px 0px 3px #3d3d3d;
+  box-shadow: 0px 0px 3px var(--second-color);
 }
 
 .user-img{
@@ -34,14 +40,14 @@ body{
   margin-bottom: 25px;
 }
 
-.form-group input{
+.login-form .modal-content .form-group input{
   border-radius: 5px;
   border: 0;
   font-size: 18px;
   padding-left: 44px;
 }
 
-.form-group::before{
+.login-form .form-group::before{
   font-family: 'Font Awesome\ 5 Free';
   content: "\f1fa";
   position: absolute;
@@ -51,7 +57,7 @@ body{
   margin-left: 14px;
 }
 
-.form-group:last-of-type::before{
+.login-form .form-group:last-of-type::before{
   content: "\f084";
 }
 
@@ -60,11 +66,12 @@ button{
 }
 
 .btn {
-  background-color: #fbc303;
+  background-color: var(--first-color);
   font-size: 18px;
   padding: 7px 14px;
   border-radius: 5px;
-  border-bottom: 4px solid #f68a0d;
+  border-bottom: 4px solid var(--third-color);
+  opacity: 1;
 }
 
 .btn:hover, .btn:focus{
@@ -74,4 +81,16 @@ button{
 .svg-inline--fa{
   fontsize: 20px;
   margin-right: 5px;
+}
+
+#newUser{
+  color: white;
+}
+
+#newUser a{
+  color: var(--third-color);
+}
+
+.form-check-label{
+  color: white;
 }
