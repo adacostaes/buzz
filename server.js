@@ -8,6 +8,8 @@ const passport = require('passport')
 const flash = require('express-flash');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const { ensureAuthenticated } = require('./auth')
+const { ensureNotAuthenticated } = require('./noauth')
 
 const initializePassport = require('./passport-config')
 
@@ -23,8 +25,8 @@ const app = express()
 app.use(cookieParser('keyboard cat'));
 app.use(session({
   secret: 'secret',
-  resave: false,
-  saveUninitialized: false
+  resave: true,
+  saveUninitialized: true
   //cookie: { maxAge: 60000 }
 }));
 app.use(passport.initialize())
@@ -32,6 +34,12 @@ app.use(passport.session())
 
 
 app.use(flash());
+
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash('success_msg')
+  res.locals.error_msg = req.flash('error_msg')
+  next()
+})
 
 
 app.use(bodyParser.urlencoded({
@@ -51,55 +59,11 @@ app.use(
 
 initializePassport(
   passport,
-  email =>  users.find(user => user.email === email),
+  email => users.find(user => user.email === email),
   id => users.find(user => user.id === id)
 )
 
 const users = []
-
-/*
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.serializeUser(function(users, done) {
-  done(null, user._id);
-});
-
-passport.deserializeUser(function(_id, done) {
-  UserModel.findById(_id, (err, user) => done(err, user));
-});
-
-passport.use("local", new LocalStrategy({
-    usernameField: 'email',
-    passwordField: 'password'
-  },
-  function(email, password, done) {
-    console.log(UserModel.findOne({email}))
-    UserModel.findOne({ email })
-      .then(users => {
-        if (!users || !users.validPassword(password)) {
-          done(null, false, { message: "Invalid email/password" });
-        } else {
-          done(null, users);
-        }
-      })
-      .catch(e => done(e));
-  }
-));
-
-const loggedInOnly = (req, res, next) => {
-  if (req.isAuthenticated()) next();
-  else res.redirect("/");
-};
-
-const loggedOutOnly = (req, res, next) => {
-  if (req.isUnauthenticated()) next();
-  else res.redirect("/home");
-};
-*/
-// END PASSPORT
-
-
 
 const mongoURI = 'mongodb://localhost:27017/buzzzdb'
 
@@ -116,8 +80,8 @@ app.listen(port, function() {
   console.log('Le serveur tourne sur le port: ' + port)
 })
 
-app.get('/register', function(request, response) {
-  response.sendFile(__dirname + '/views/register.html')
+app.get('/register', ensureNotAuthenticated, function(request, response) {
+  response.render('register.ejs')
 });
 
 app.post('/register', function(req, res) {
@@ -140,35 +104,33 @@ app.post('/register', function(req, res) {
           console.log(req.body)
           console.log(newUser)
           newUser.save(function(err) {
+
             if (!err) {
-              return res.send({
-                status: 'User created'
-              })
+                req.flash('success_msg', 'Vous êtes maintenant enregistré, vous pouvez vous identifier.')
+                res.redirect('/')
             } else {
               if (err.name == 'ValidationError') {
-                res.statusCode = 400;
-                res.send({
-                  error: 'Bad Request'
-                })
-              } else {
-                res.statusCode = 500;
-                res.send({
-                  error: 'Internal Server Error'
-                })
+                req.flash('error_msg', 'Mauvaise requête.')
+                res.redirect('/')
+                } else {
+                req.flash('error_msg', 'Erreur interne.')
+                res.redirect('/')
               }
             }
           });
         });
       });
     } else {
-      res.send('Les mots de passes ne correspondent pas.')
+      req.flash('error_msg', 'Les mots de passes ne correspondent pas.')
+      res.redirect('/register')
     }
   } else {
-    res.send('Veuillez remplir tous les champs du formulaire.')
+    req.flash('error_msg', 'Veuillez remplir tous les champs du formulaire.')
+    res.redirect('/register')
   }
 });
 
-app.get('/', function(request, response) {
+app.get('/', ensureNotAuthenticated, function(request, response) {
   response.render('index.ejs')
   //response.sendFile(__dirname + '/views/index.ejs')
 });
@@ -178,3 +140,54 @@ app.post("/", passport.authenticate("local", {
   failureRedirect: "/",
   failureFlash: true
 }));
+
+app.get('/home', ensureAuthenticated, function(request, response) {
+  response.render('home.ejs', {
+    firstname: request.user.firstName,
+    lastname: request.user.lastName,
+    email: request.user.email,
+    gender: request.user.gender,
+    country: request.user.country,
+    city: request.user.city,
+    birthdate: request.user.birthdate
+  })
+
+});
+
+app.post('/home', function(req, res) {
+
+  if (req.body.post) {
+    var newPost = new PostModel({
+      id: Date.now().toString(),
+      firstName: "Yazid",
+      lastName: "Mtkl",
+      post: req.body.post,
+      userId: "111111122222"
+    });
+    console.log(req.body)
+    console.log(newPost)
+    newPost.save(function(err) {
+      if (!err) {
+        req.flash('success_msg', 'Envoyé!')
+        res.redirect('/home')
+      } else {
+        if (err.name == 'ValidationError') {
+          req.flash('error_msg', 'Mauvaise requête.')
+          res.redirect('/home')
+        } else {
+          req.flash('error_msg', 'Erreur interne.')
+          res.redirect('/')
+        }
+      }
+    });
+  } else {
+    res.send('Votre message est vide.')
+  }
+});
+
+app.get('/logout', function(request, response) {
+  request.logout();
+  request.flash('sucess_msg', 'A plus tard!')
+  response.redirect('/')
+
+});
