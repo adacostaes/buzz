@@ -13,31 +13,6 @@ function getUserByEmail(email) {
 
 function initialize(passport, getUserByEmail, getUserById) {
 
-  /*const authenticateUser = async (email, password, done) => {
-    const user = UserModel.findOne({
-        email: email
-      })
-    if (user == null) {
-      return done(null, false, {
-        message: 'Cet e-mail n\'est lié à aucun utilisateur.'
-      })
-    }
-
-    try {
-      if (await bcrypt.compare(password, user.password, function(err, result){
-
-      })) {
-        return done(null, user)
-      } else {
-        return done(null, false, {
-          message: 'Le mot de passe est incorrect.'
-        })
-      }
-    } catch (err) {
-      return done(err)
-    }
-  }*/
-
   passport.use(new LocalStrategy({
           usernameField: 'email'
         }, (email, password, done) => {
