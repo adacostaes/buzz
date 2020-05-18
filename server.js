@@ -12,6 +12,7 @@ const cookieParser = require('cookie-parser');
 const initializePassport = require('./passport-config')
 
 var UserModel = require('./userModel')
+var PostModel = require('./postModel')
 
 var LocalStrategy = require('passport-local').Strategy;
 
