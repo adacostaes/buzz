@@ -37,6 +37,24 @@ const userSchema = new mongoose.Schema({
   createdOn: {
     type: String,
     default: Date.now
+  },
+  profilePicture: {
+    data: Buffer,
+    contentType: String,
+    default: ""
+  },
+  alias: {
+    type: String,
+    default: ""
+  },
+  description: {
+    type: String,
+    maxlength: 200,
+    default: ""
+  },
+  isCompleted: {
+    type: Boolean,
+    default: false
   }
 })
 

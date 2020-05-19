@@ -8,11 +8,23 @@ const passport = require('passport')
 const flash = require('express-flash');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
-const { ensureAuthenticated } = require('./auth')
-const { ensureNotAuthenticated } = require('./noauth')
-
+const {
+  ensureAuthenticated
+} = require('./auth')
+const {
+  ensureNotAuthenticated
+} = require('./noauth')
 const initializePassport = require('./passport-config')
 
+const multer = require('multer')
+var upload = multer({
+  dest: './uploads/',
+  rename: function(fieldname, filename) {
+    return filename;
+  },
+});
+
+var PictureModel = require('./pictureModel')
 var UserModel = require('./userModel')
 var PostModel = require('./postModel')
 
@@ -21,6 +33,8 @@ var LocalStrategy = require('passport-local').Strategy;
 var port = process.env.PORT || 5000
 
 const app = express()
+
+
 
 app.use(cookieParser('keyboard cat'));
 app.use(session({
@@ -84,6 +98,18 @@ app.get('/register', ensureNotAuthenticated, function(request, response) {
   response.render('register.ejs')
 });
 
+function capital_letter(str) {
+  str = str.split(" ");
+
+  for (let i = 0, x = str.length; i < x; i++) {
+    str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+  }
+
+  return str.join(" ");
+}
+
+console.log(capital_letter("Write a JavaScript program to capitalize the first letter of each word of a given string."));
+
 app.post('/register', function(req, res) {
 
   if (req.body.firstname && req.body.lastname && req.body.email && req.body.password && req.body.confirmPwd && req.body.gender && req.body.city) {
@@ -92,13 +118,13 @@ app.post('/register', function(req, res) {
         bcrypt.hash(req.body.password, salt, function(err, hash) {
           var newUser = new UserModel({
             id: Date.now().toString(),
-            firstName: req.body.firstname,
-            lastName: req.body.lastname,
+            firstName: capital_letter(req.body.firstname),
+            lastName: capital_letter(req.body.lastname),
             email: req.body.email,
             password: hash,
             gender: req.body.gender,
             country: req.body.country,
-            city: req.body.city,
+            city: capital_letter(req.body.city),
             birthdate: req.body.birthdate
           });
           console.log(req.body)
@@ -106,13 +132,13 @@ app.post('/register', function(req, res) {
           newUser.save(function(err) {
 
             if (!err) {
-                req.flash('success_msg', 'Vous êtes maintenant enregistré, vous pouvez vous identifier.')
-                res.redirect('/')
+              req.flash('success_msg', 'Vous êtes maintenant enregistré, vous pouvez vous identifier.')
+              res.redirect('/')
             } else {
               if (err.name == 'ValidationError') {
                 req.flash('error_msg', 'Mauvaise requête.')
                 res.redirect('/')
-                } else {
+              } else {
                 req.flash('error_msg', 'Erreur interne.')
                 res.redirect('/')
               }
@@ -149,7 +175,8 @@ app.get('/home', ensureAuthenticated, function(request, response) {
     gender: request.user.gender,
     country: request.user.country,
     city: request.user.city,
-    birthdate: request.user.birthdate
+    birthdate: request.user.birthdate,
+    isCompleted: request.user.isCompleted
   })
 
 });
@@ -190,4 +217,34 @@ app.get('/logout', function(request, response) {
   request.flash('sucess_msg', 'A plus tard!')
   response.redirect('/')
 
+});
+
+app.get('/updateProfile', function(req, res) {
+
+  if (req.body.photo) {
+    if (req.body.pseudo) {
+      if (req.body.description) {
+        var newPicture = new PictureModel();
+        newPicture.img.data = fs.readFileSync(req.files.photo.path)
+        newPicture.img.contentType = 'image/png';
+
+        var query = {'profilePicture': req.user.profilePicture}
+        User.findOneAndUpdate(query, newPicture, {upsert: true}, function(err, doc){
+          if (err) return res.send(500, {error: err})
+          return res.send('Sauvegardé.')
+        })
+      } else {
+        req.flash('error_msg', 'Veuillez compléter votre biographie.')
+        //res.redirect('/')
+      }
+
+    } else {
+      req.flash('error_msg', 'Veuillez renseigner votre pseudonyme.')
+      //res.redirect('/')
+    }
+
+  } else {
+    req.flash('error_msg', 'Veuillez joindre une photo de profile.')
+    //res.redirect('/')
+  }
 });
