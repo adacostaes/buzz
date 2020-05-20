@@ -15,16 +15,45 @@ const {
   ensureNotAuthenticated
 } = require('./noauth')
 const initializePassport = require('./passport-config')
-
 const multer = require('multer')
-var upload = multer({
-  dest: './uploads/',
-  rename: function(fieldname, filename) {
-    return filename;
-  },
-});
 
-var PictureModel = require('./pictureModel')
+// Stockage image
+const storage = multer.diskStorage({
+  destination: './uploads/',
+  filename: function(req, file, callback) {
+    callback(null, req.user.email + path.extname(file.originalname))
+  }
+})
+
+// Initialisation upload
+const upload = multer({
+  storage: storage,
+  limits: {
+    filesize: 2000000
+  },
+  fileFilter: function(req, file, callback) {
+    checkFileType(file, callback);
+  }
+}).single('photo')
+
+// Check extension image
+function checkFileType(file, callback) {
+
+  // Extensions acceptées
+  const filetypes = /jpeg|jpg|png|gif/;
+
+  // Vérification
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
+
+  const mimetype = filetypes.test(file.mimetype)
+
+  if (mimetype && extname) {
+    return callback(null, true)
+  } else {
+    callback('Erreur, le fichier n\'est pas une image.')
+  }
+}
+
 var UserModel = require('./userModel')
 var PostModel = require('./postModel')
 
@@ -59,9 +88,11 @@ app.use((req, res, next) => {
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use(bodyParser.json())
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+
 app.use(cors())
 app.use(
   bodyParser.urlencoded({
@@ -176,7 +207,10 @@ app.get('/home', ensureAuthenticated, function(request, response) {
     country: request.user.country,
     city: request.user.city,
     birthdate: request.user.birthdate,
-    isCompleted: request.user.isCompleted
+    isCompleted: request.user.isCompleted,
+    alias: request.user.alias,
+    profilePictureURL: request.user.profilePictureURL,
+    description: request.user.description
   })
 
 });
@@ -219,32 +253,65 @@ app.get('/logout', function(request, response) {
 
 });
 
-app.get('/updateProfile', function(req, res) {
+app.post('/updateProfile', function(req, res) {
 
-  if (req.body.photo) {
-    if (req.body.pseudo) {
-      if (req.body.description) {
-        var newPicture = new PictureModel();
-        newPicture.img.data = fs.readFileSync(req.files.photo.path)
-        newPicture.img.contentType = 'image/png';
-
-        var query = {'profilePicture': req.user.profilePicture}
-        User.findOneAndUpdate(query, newPicture, {upsert: true}, function(err, doc){
-          if (err) return res.send(500, {error: err})
-          return res.send('Sauvegardé.')
-        })
-      } else {
-        req.flash('error_msg', 'Veuillez compléter votre biographie.')
-        //res.redirect('/')
-      }
-
+  upload(req, res, function(err) {
+    if (err) {
+      req.flash('error_msg', 'Une erreur est survenue. Vérifiez l\'extension du fichier.')
+      res.redirect('/home')
     } else {
-      req.flash('error_msg', 'Veuillez renseigner votre pseudonyme.')
-      //res.redirect('/')
-    }
+      if (req.file) {
+        if (req.body.pseudo) {
+          if (req.body.description) {
 
-  } else {
-    req.flash('error_msg', 'Veuillez joindre une photo de profile.')
-    //res.redirect('/')
-  }
+            var id = req.user.id
+
+
+
+            UserModel.findOne({
+              id: id
+            }, function(err, foundObject) {
+              if (err) {
+                req.flash('error_msg', 'Une erreur est survenue.')
+                res.redirect('/home')
+              } else {
+
+                if (!foundObject) {
+                  req.flash('error_msg', 'Objet non trouvé..')
+                  res.redirect('/home')
+                } else {
+                  foundObject.alias = req.body.pseudo
+                  foundObject.description = req.body.description
+                  foundObject.profilePictureURL = "../uploads/" + req.file.name
+                  foundObject.isCompleted = true
+                  console.log(req.file)
+
+                  foundObject.save(function(err, updatedObject) {
+                    if (err) {
+                      req.flash('error_msg', 'Une erreur est survenue lors de l\'enregistrement. Veuillez recommencer.')
+                      res.redirect('/home')
+                    } else {
+                      req.flash('success_msg', 'Vous avez complété votre profil avec succès.')
+                      res.redirect('/home')
+                    }
+                  })
+
+                }
+              }
+            })
+
+          } else {
+            req.flash('error_msg', 'Veuillez compléter votre biographie.')
+            res.redirect('/home')
+          }
+        } else {
+          req.flash('error_msg', 'Veuillez renseigner votre pseudonyme.')
+          res.redirect('/home')
+        }
+      } else {
+        req.flash('error_msg', 'Veuillez joindre une photo de profil.')
+        res.redirect('/home')
+      }
+    }
+  })
 });

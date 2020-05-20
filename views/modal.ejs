@@ -14,7 +14,9 @@
               </button>
             </div>
             <div class="modal-body row">
-              <form class="col" enctype="multipart/form-data" action="/updateProfile">
+
+
+              <form class="col" enctype="multipart/form-data" method="post" action="/updateProfile">
                 <div class="form-group">
                   <label for="photo" class="form-control-label">Photo de profil</label>
                   <input type="file" name="photo">
@@ -29,6 +31,8 @@
                 </div>
                 <input type="submit" value="Mettre à jour" class="btn col-md-12">
               </form>
+
+
             </div>
           </div>
         </div>
