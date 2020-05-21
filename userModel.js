@@ -5,9 +5,6 @@ function toLower(str) {
 }
 
 const userSchema = new mongoose.Schema({
-  id: {
-    type: String
-  },
   firstName: {
     type: String
   },

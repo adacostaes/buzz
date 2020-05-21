@@ -189,7 +189,6 @@ app.post('/register', function(req, res) {
 
 app.get('/', ensureNotAuthenticated, function(request, response) {
   response.render('index.ejs')
-  //response.sendFile(__dirname + '/views/index.ejs')
 });
 
 app.post("/", passport.authenticate("local", {
@@ -200,6 +199,7 @@ app.post("/", passport.authenticate("local", {
 
 app.get('/home', ensureAuthenticated, function(request, response) {
   response.render('home.ejs', {
+    id: request.user.id,
     firstname: request.user.firstName,
     lastname: request.user.lastName,
     email: request.user.email,
@@ -264,12 +264,12 @@ app.post('/updateProfile', function(req, res) {
         if (req.body.pseudo) {
           if (req.body.description) {
 
-            var id = req.user.id
+            var id = req.user._id
 
 
 
             UserModel.findOne({
-              id: id
+              _id: id
             }, function(err, foundObject) {
               if (err) {
                 req.flash('error_msg', 'Une erreur est survenue.')
@@ -282,7 +282,7 @@ app.post('/updateProfile', function(req, res) {
                 } else {
                   foundObject.alias = req.body.pseudo
                   foundObject.description = req.body.description
-                  foundObject.profilePictureURL = "../uploads/" + req.file.name
+                  foundObject.profilePictureURL = "../uploads/" + req.file.filename
                   foundObject.isCompleted = true
                   console.log(req.file)
 
@@ -315,3 +315,18 @@ app.post('/updateProfile', function(req, res) {
     }
   })
 });
+
+// Profil utilisateur
+
+
+app.get("/profile/:id", function (req, res) {
+  UserModel.findById(req.params.id, function (err, foundUser){
+    if (err) {
+      console.log(err)
+      req.flash('error_msg', 'Utilisateur non trouvé.')
+      res.redirect('/home')
+      return
+    }
+    res.render('profile.ejs', {user: foundUser})
+  })
+})
