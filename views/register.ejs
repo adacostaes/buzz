@@ -1,0 +1,146 @@
+<html>
+
+<head>
+  <title>Buzzz - Inscription</title>
+  <link rel="icon" href="medias/favicon.ico" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/solid.css">
+  <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+<body>
+  <% if (messages.error) { %>
+    <%= messages.error %>
+    <% } %>
+  <script type="text/javascript">
+    function surligne(champ, erreur) {
+      if (erreur)
+        champ.style.backgroundColor = "#fba";
+      else
+        champ.style.backgroundColor = "";
+    }
+
+    function verifMail(champ) {
+      var regex = /^[a-zA-Z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/;
+      if (!regex.test(champ.value)) {
+        surligne(champ, true);
+        return false;
+      } else {
+        surligne(champ, false);
+        return true;
+      }
+    }
+
+    function validation() {
+      var pwd = document.getElementById("registerPassword").value;
+      var confirmPwd = document.getElementById("registerPasswordConfirmation").value;
+
+      var msg = ""
+
+      if (pwd != confirmPwd) {
+        alert("Erreur: les mots de passes ne correspondent pas.");
+        return false;
+      } else{
+        if (pwd.match(/[0-9]/g) && pwd.match(/[A-Z]/g) && pwd.match(/[a-z]/g) && pwd.match(/[^a-zA-Z\d]/g) && str.length >= 8) {
+          document.getElementById("msg").innerHTML = "<p style='color:green'>Mot de passe fort.</p>"
+        } else {
+          document.getElementById("msg").innerHTML = "<p style='color:red'>Mot de passe trop faible. Au moins: 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial, 8 caractères de longueur.</p>"
+        }
+      }
+    }
+  </script>
+  <div class="modal-dialog text-center">
+    <div class="col-sm-8 main-section">
+
+      <div class="modal-content">
+
+        <div class="col-12 user-img">
+          <img src="medias/logo.png" alt="Logo">
+        </div>
+        <div class="panel-body">
+
+          <form name="registerForm" role="form" method="post" action="/register">
+            <div class="row">
+              <div class="col-xs-6 col-sm-6 col-md-6">
+                <%- include ("./messages") %>
+                <div class="form-group">
+                  <input type="text" name="firstname" id="registerFirstName" class="form-control input-sm" placeholder="Prénom" style="text-transform: capitalize;" required>
+                </div>
+              </div>
+              <div class="col-xs-6 col-sm-6 col-md-6">
+                <div class="form-group">
+                  <input type="text" name="lastname" id="registerLastName" class="form-control input-sm" placeholder="Nom" style="text-transform: capitalize;" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <input type="email" name="email" id="registerEmail" class="form-control input-sm" placeholder="Adresse e-mail" style="text-transform: lowercase;" onblur="verifMail(this)" required>
+            </div>
+
+            <div class="row">
+              <div class="col-xs-6 col-sm-6 col-md-6">
+                <div class="form-group">
+                  <input type="password" name="password" id="registerPassword" class="form-control input-sm" placeholder="Mot de passe" required>
+                </div>
+              </div>
+              <div class="col-xs-6 col-sm-6 col-md-6">
+                <div class="form-group">
+                  <input type="password" name="confirmPwd" id="registerPasswordConfirmation" class="form-control input-sm" placeholder="Confirmation" onblur="validation()" required>
+                </div>
+              </div>
+            </div>
+            <p id="msg"></p>
+            <div class="form-group">
+              <label class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="gender" value="Homme">
+                <span class="form-check-label"> Homme </span>
+              </label>
+              <label class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="gender" value="Femme">
+                <span class="form-check-label"> Femme </span>
+              </label>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <select name="country" id="country" class="form-control">
+                  <option value="" disabled>Pays</option>
+                  <option value="France" selected>France</option>
+                </select>
+              </div>
+              <div class="form-group col-md-6">
+                <input type="text" class="form-control" placeholder="Ville" name="city" style="text-transform: capitalize;" required>
+              </div>
+
+              <div class="form-group col-md-12">
+                <label class="form-check-label" for="birthdate">Date de naissance</label>
+                <input class="form-control" type="date" value="2000-01-01" name="birthdate" id="birthdate" required>
+              </div>
+
+              <input type="submit" value="S'enregistrer" class="btn col-md-12">
+
+          </form>
+        </div>
+      </div>
+      <!--- Fin card -->
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>

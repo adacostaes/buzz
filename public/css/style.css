@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+:root{
+  --first-color: #fbc303;
+  --second-color: #3d3d3d;
+  --third-color: #f68a0d;
+}
+
+body{
+  font-family: 'Open Sans', sans-serif;
+  background: url(../medias/background.jpg) no-repeat center center fixed;
+  background-size: cover;
+}
+
+.main-section{
+  margin: 0 auto;
+  margin-top: 90px;
+  padding: 0;
+}
+
+.modal-content{
+  background-color: var(--second-color);
+  opacity: .92;
+  padding: 0 18px;
+  box-shadow: 0px 0px 3px var(--second-color);
+}
+
+.user-img{
+  margin-top: -80px;
+  margin-bottom: 25px;
+}
+
+.user-img img{
+  height: 200px;
+  width: 200px;
+  border-radius: 5px;
+}
+
+.form-group{
+  margin-bottom: 25px;
+}
+
+.login-form .modal-content .form-group input{
+  border-radius: 5px;
+  border: 0;
+  font-size: 18px;
+  padding-left: 44px;
+}
+
+.login-form .form-group::before{
+  font-family: 'Font Awesome\ 5 Free';
+  content: "\f1fa";
+  position: absolute;
+  font-size: 18px;
+  color: #3d3d3d;
+  padding-top: 2px;
+  margin-left: 14px;
+}
+
+.login-form .form-group:last-of-type::before{
+  content: "\f084";
+}
+
+button{
+  margin: 5px 0px 25px;
+}
+
+.btn {
+  background-color: var(--first-color);
+  font-size: 18px;
+  padding: 7px 14px;
+  border-radius: 5px;
+  border-bottom: 4px solid var(--third-color);
+  opacity: 1;
+}
+
+.btn:hover, .btn:focus{
+  background-color: #e3af02!important;
+}
+
+.svg-inline--fa{
+  fontsize: 20px;
+  margin-right: 5px;
+}
+
+#newUser{
+  color: white;
+}
+
+#newUser a{
+  color: var(--third-color);
+}
+
+.form-check-label{
+  color: white;
+}
