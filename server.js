@@ -19,8 +19,8 @@ const multer = require('multer')
 
 // Stockage image
 const storage = multer.diskStorage({
-  destination: './uploads/',
-  filename: function(req, file, callback) {
+  destination: '../uploads/',
+  filename: function (req, file, callback) {
     callback(null, req.user.email + path.extname(file.originalname))
   }
 })
@@ -31,7 +31,7 @@ const upload = multer({
   limits: {
     filesize: 2000000
   },
-  fileFilter: function(req, file, callback) {
+  fileFilter: function (req, file, callback) {
     checkFileType(file, callback);
   }
 }).single('photo')
@@ -109,18 +109,18 @@ mongoose
   .set('useUnifiedTopology', true)
   .connect(
     mongoURI, {
-      useNewUrlParser: true,
-      useCreateIndex: true
-    }
+    useNewUrlParser: true,
+    useCreateIndex: true
+  }
   )
   .then(() => console.log('MongoDB connecté.'))
   .catch(err => console.log('Erreur: ' + err))
 
-app.listen(port, function() {
+app.listen(port, function () {
   console.log('Le serveur tourne sur le port: ' + port)
 })
 
-app.get('/register', ensureNotAuthenticated, function(request, response) {
+app.get('/register', ensureNotAuthenticated, function (request, response) {
   response.render('register.ejs')
 });
 
@@ -134,12 +134,12 @@ function capital_letter(str) {
   return str.join(" ");
 }
 
-app.post('/register', function(req, res) {
+app.post('/register', function (req, res) {
 
   if (req.body.firstname && req.body.lastname && req.body.email && req.body.password && req.body.confirmPwd && req.body.gender && req.body.city) {
     if (req.body.password == req.body.confirmPwd) {
-      bcrypt.genSalt(10, function(err, salt) {
-        bcrypt.hash(req.body.password, salt, function(err, hash) {
+      bcrypt.genSalt(10, function (err, salt) {
+        bcrypt.hash(req.body.password, salt, function (err, hash) {
           var newUser = new UserModel({
             id: Date.now().toString(),
             firstName: capital_letter(req.body.firstname),
@@ -153,7 +153,7 @@ app.post('/register', function(req, res) {
           });
           console.log(req.body)
           console.log(newUser)
-          newUser.save(function(err) {
+          newUser.save(function (err) {
 
             if (!err) {
               req.flash('success_msg', 'Vous êtes maintenant enregistré, vous pouvez vous identifier.')
@@ -180,7 +180,7 @@ app.post('/register', function(req, res) {
   }
 });
 
-app.get('/', ensureNotAuthenticated, function(request, response) {
+app.get('/', ensureNotAuthenticated, function (request, response) {
   response.render('index.ejs')
 });
 
@@ -190,7 +190,7 @@ app.post("/", passport.authenticate("local", {
   failureFlash: true
 }));
 
-app.get('/home', ensureAuthenticated, function(request, response) {
+app.get('/home', ensureAuthenticated, function (request, response) {
   response.render('home.ejs', {
     id: request.user.id,
     firstname: request.user.firstName,
@@ -208,7 +208,7 @@ app.get('/home', ensureAuthenticated, function(request, response) {
 
 });
 
-app.post('/home', function(req, res) {
+app.post('/home', function (req, res) {
 
   if (req.body.post) {
     var newPost = new PostModel({
@@ -220,7 +220,7 @@ app.post('/home', function(req, res) {
     });
     console.log(req.body)
     console.log(newPost)
-    newPost.save(function(err) {
+    newPost.save(function (err) {
       if (!err) {
         req.flash('success_msg', 'Envoyé!')
         res.redirect('/home')
@@ -239,16 +239,16 @@ app.post('/home', function(req, res) {
   }
 });
 
-app.get('/logout', function(request, response) {
+app.get('/logout', function (request, response) {
   request.logout();
   request.flash('sucess_msg', 'A plus tard!')
   response.redirect('/')
 
 });
 
-app.post('/updateProfile', function(req, res) {
+app.post('/confirmProfile', function (req, res) {
 
-  upload(req, res, function(err) {
+  upload(req, res, function (err) {
     if (err) {
       req.flash('error_msg', 'Une erreur est survenue. Vérifiez l\'extension du fichier.')
       res.redirect('/home')
@@ -263,7 +263,7 @@ app.post('/updateProfile', function(req, res) {
 
             UserModel.findOne({
               _id: id
-            }, function(err, foundObject) {
+            }, function (err, foundObject) {
               if (err) {
                 req.flash('error_msg', 'Une erreur est survenue.')
                 res.redirect('/home')
@@ -279,7 +279,7 @@ app.post('/updateProfile', function(req, res) {
                   foundObject.isCompleted = true
                   console.log(req.file)
 
-                  foundObject.save(function(err, updatedObject) {
+                  foundObject.save(function (err, updatedObject) {
                     if (err) {
                       req.flash('error_msg', 'Une erreur est survenue lors de l\'enregistrement. Veuillez recommencer.')
                       res.redirect('/home')
@@ -312,8 +312,8 @@ app.post('/updateProfile', function(req, res) {
 // Profil utilisateur
 
 
-app.get("/profile/:id", ensureAuthenticated ,function (req, res) {
-  UserModel.findById(req.params.id, function (err, foundUser){
+app.get("/profile/:id", ensureAuthenticated, function (req, res) {
+  UserModel.findById(req.params.id, function (err, foundUser) {
     if (err) {
       console.log(err)
       req.flash('error_msg', 'Utilisateur non trouvé.')
@@ -321,6 +321,73 @@ app.get("/profile/:id", ensureAuthenticated ,function (req, res) {
       return
     }
     console.log(req.session.passport.user)
-    res.render('profile.ejs', {user: foundUser, req: req})
+    res.render('profile.ejs', { user: foundUser, req: req })
   })
 })
+
+app.post("/updateProfile", function (req, res) {
+
+  upload(req, res, function (err) {
+    if (err) {
+      req.flash('error_msg', 'Une erreur est survenue. Vérifiez l\'extension du fichier.')
+      res.redirect('/home')
+    } else {
+      var id = req.user._id
+      UserModel.findOne({
+        _id: id
+      }, function (err, foundObject) {
+        if (err) {
+          req.flash('error_msg', 'Une erreur est survenue.')
+          res.redirect('/home')
+        } else {
+
+          if (!foundObject) {
+            req.flash('error_msg', 'Objet non trouvé..')
+            res.redirect('/home')
+          } else {
+            if (req.file) {
+              foundObject.profilePictureURL = "../uploads/" + req.file.filename
+
+              if (req.body.updateCountry) {
+                foundObject.country = req.body.updateCountry.trim()
+
+                if (req.body.updateCity) {
+                  foundObject.city = req.body.updateCity.trim()
+
+                  if (req.body.updateDescription) {
+                    foundObject.description = req.body.updateDescription
+
+                  } else {
+                    req.flash('error_msg', 'Veuillez compléter votre biographie.')
+                    res.redirect('/home')
+                  }
+                } else {
+                  req.flash('error_msg', 'Veuillez renseigner votre pseudonyme.')
+                  res.redirect('/home')
+                }
+              } else {
+                req.flash('error_msg', 'Veuillez joindre une photo de profil.')
+                res.redirect('/home')
+              }
+            } else {
+
+            }
+
+            foundObject.isCompleted = true
+
+            foundObject.save(function (err, updatedObject) {
+              if (err) {
+                req.flash('error_msg', 'Une erreur est survenue lors de l\'enregistrement. Veuillez recommencer.')
+                res.redirect('/home')
+              } else {
+                req.flash('success_msg', 'Vous avez mis à jour votre profil avec succès.')
+                res.redirect('/home')
+              }
+            })
+
+          }
+        }
+      })
+    }
+  })
+});
