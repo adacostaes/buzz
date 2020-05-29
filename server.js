@@ -19,7 +19,7 @@ const multer = require('multer')
 
 // Stockage image
 const storage = multer.diskStorage({
-  destination: '../uploads/',
+  destination: './uploads/',
   filename: function (req, file, callback) {
     callback(null, req.user.email + path.extname(file.originalname))
   }
@@ -151,8 +151,6 @@ app.post('/register', function (req, res) {
             city: capital_letter(req.body.city),
             birthdate: req.body.birthdate
           });
-          console.log(req.body)
-          console.log(newUser)
           newUser.save(function (err) {
 
             if (!err) {
@@ -259,8 +257,6 @@ app.post('/confirmProfile', function (req, res) {
 
             var id = req.user._id
 
-
-
             UserModel.findOne({
               _id: id
             }, function (err, foundObject) {
@@ -273,11 +269,12 @@ app.post('/confirmProfile', function (req, res) {
                   req.flash('error_msg', 'Objet non trouvé..')
                   res.redirect('/home')
                 } else {
-                  foundObject.alias = req.body.pseudo.trim()
+                  trimmedAlias = req.body.pseudo
+                  foundObject.alias = trimmedAlias.replace(/\s/g, "")
                   foundObject.description = req.body.description
                   foundObject.profilePictureURL = "../uploads/" + req.file.filename
                   foundObject.isCompleted = true
-                  console.log(req.file)
+                  foundObject.lastUpdated = Date.now()
 
                   foundObject.save(function (err, updatedObject) {
                     if (err) {
@@ -345,42 +342,49 @@ app.post("/updateProfile", function (req, res) {
             req.flash('error_msg', 'Objet non trouvé..')
             res.redirect('/home')
           } else {
+
+            var str = "Vous avez mis à jour les champs suivants: "
+
             if (req.file) {
               foundObject.profilePictureURL = "../uploads/" + req.file.filename
-
-              if (req.body.updateCountry) {
-                foundObject.country = req.body.updateCountry.trim()
-
-                if (req.body.updateCity) {
-                  foundObject.city = req.body.updateCity.trim()
-
-                  if (req.body.updateDescription) {
-                    foundObject.description = req.body.updateDescription
-
-                  } else {
-                    req.flash('error_msg', 'Veuillez compléter votre biographie.')
-                    res.redirect('/home')
-                  }
-                } else {
-                  req.flash('error_msg', 'Veuillez renseigner votre pseudonyme.')
-                  res.redirect('/home')
-                }
-              } else {
-                req.flash('error_msg', 'Veuillez joindre une photo de profil.')
-                res.redirect('/home')
-              }
-            } else {
-
+              str += "Photo de profil  "
             }
 
-            foundObject.isCompleted = true
+            if (req.body.updateCountry) {
+              foundObject.country = req.body.updateCountry.trim()
+              str += "Pays "
+            }
+
+            if (req.body.updateCity) {
+              foundObject.city = req.body.updateCity.trim()
+              str += "Ville "
+            }
+
+            if (req.body.updateDescription) {
+              foundObject.description = req.body.updateDescription
+              str += "Description "
+            }
+
+            if (req.body.updatePassword == req.body.updatePasswordConfirmation) {
+              bcrypt.genSalt(10, function (err, salt) {
+                bcrypt.hash(req.body.updatePassword, salt, function (err, hash) {
+                  console.log(hash)
+                  foundObject.password = hash
+                  str += "Mot de passe "
+                })
+              })
+            }
+
+            foundObject.lastUpdated = new Date()
+            console.log(foundObject)
 
             foundObject.save(function (err, updatedObject) {
               if (err) {
                 req.flash('error_msg', 'Une erreur est survenue lors de l\'enregistrement. Veuillez recommencer.')
                 res.redirect('/home')
               } else {
-                req.flash('success_msg', 'Vous avez mis à jour votre profil avec succès.')
+                console.log
+                req.flash('success_msg', str)
                 res.redirect('/home')
               }
             })

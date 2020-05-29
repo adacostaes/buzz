@@ -17,7 +17,7 @@
   <%= messages.error %>
   <% } %>
   <nav class="navbar navbar-light bg-white">
-    <a href="#" class="navbar-brand"> <img id="logo" src="/medias/logo_header.png" alt="Logo"> <span id="logo-text"> BUZZZ </span></a>
+    <a href="/home" class="navbar-brand"> <img id="logo" src="/medias/logo_header.png" alt="Logo"> <span id="logo-text"> BUZZZ </span></a>
     <a href="/logout"><button type="button" class="btn btn-default btn-sm">
         <span class="fas fa-sign-out-alt"></span> Se déconnecter
       </button>
@@ -109,10 +109,10 @@
           <div class="centered-text col-sm-offset-3 col-sm-6 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6">
             <div itemscope="" itemtype="http://schema.org/Person">
               <!--FORM -->
-              <form name="registerForm" role="form" method="post" action="/register">
+              <form name="updateProfileForm" role="form" enctype="multipart/form-data" method="post" action="/updateProfile">
                 <div class="form-group">
                   <img style="width:300px;height:300px;border-radius:50%;" src="<%= user.profilePictureURL %>" alt="Web Design" class="img-circle">
-                  <input type="file">
+                  <input type="file" name="photo">
                 </div>
               <div class="row">
                 <div class="col-xs-6 col-sm-6 col-md-6">
@@ -134,30 +134,30 @@
               <div class="row">
                 <div class="col-xs-6 col-sm-6 col-md-6">
                   <div class="form-group">
-                    <input type="password" name="password" id="registerPassword" class="form-control input-sm" placeholder="Mot de passe" required>
+                    <input type="password" name="password" id="updatePassword" class="form-control input-sm" placeholder="Mot de passe">
                   </div>
                 </div>
                 <div class="col-xs-6 col-sm-6 col-md-6">
                   <div class="form-group">
-                    <input type="password" name="confirmPwd" id="registerPasswordConfirmation" class="form-control input-sm" placeholder="Confirmation" onblur="validation()" required>
+                    <input type="password" name="confirmPwd" id="updatePasswordConfirmation" class="form-control input-sm" placeholder="Confirmation" onblur="validation()">
                   </div>
                 </div>
               </div>
   
               <div class="form-row">
                 <div class="form-group col-md-6">
-                  <select name="country" id="country" class="form-control">
+                  <select name="updateCountry" id="country" class="form-control">
                     <option value="" disabled>Pays</option>
                     <option value="France" selected>France</option>
                   </select>
                 </div>
                 <div class="form-group col-md-6">
-                  <input type="text" class="form-control" placeholder="Ville" name="city" style="text-transform: capitalize;" required>
+                  <input type="text" class="form-control" placeholder="Ville" name="updateCity" style="text-transform: capitalize;">
                 </div>
 
                 <div class="form-group">
-                  <label for="myDescription">Biographie</label>
-                  <textarea name="myDescription" id="" cols="35" rows="2"></textarea>
+                  <label for="updateDescription">Biographie</label>
+                  <textarea name="updateDescription" id="" cols="35" rows="2"></textarea>
                 </div>
 
   

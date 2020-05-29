@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema({
   isCompleted: {
     type: Boolean,
     default: false
+  },
+  lastUpdated: {
+    type: String,
+    default: Date.now
   }
 })
 
