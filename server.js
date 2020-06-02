@@ -20,11 +20,7 @@ const multer = require('multer')
 // Stockage image
 const storage = multer.diskStorage({
   destination: './uploads/',
-<<<<<<< HEAD
-  filename: function(req, file, callback) {
-=======
   filename: function (req, file, callback) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
     callback(null, req.user.email + path.extname(file.originalname))
   }
 })
@@ -35,11 +31,7 @@ const upload = multer({
   limits: {
     filesize: 2000000
   },
-<<<<<<< HEAD
-  fileFilter: function(req, file, callback) {
-=======
   fileFilter: function (req, file, callback) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
     checkFileType(file, callback);
   }
 }).single('photo')
@@ -93,29 +85,13 @@ app.use((req, res, next) => {
 })
 
 
-<<<<<<< HEAD
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
-app.use(bodyParser.json())
-app.use(express.static(path.join(__dirname, 'public')))
-=======
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, '/public')))
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
 
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 app.use(cors())
-<<<<<<< HEAD
-app.use(
-  bodyParser.urlencoded({
-    extendes: false
-  })
-)
-=======
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
 
 // PASSPORT
 
@@ -130,36 +106,21 @@ const users = []
 const mongoURI = 'mongodb://localhost:27017/buzzzdb'
 
 mongoose
-<<<<<<< HEAD
-  .connect(
-    mongoURI, {
-      useNewUrlParser: true
-    }
-=======
   .set('useUnifiedTopology', true)
   .connect(
     mongoURI, {
     useNewUrlParser: true,
     useCreateIndex: true
   }
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
   )
   .then(() => console.log('MongoDB connecté.'))
   .catch(err => console.log('Erreur: ' + err))
 
-<<<<<<< HEAD
-app.listen(port, function() {
-  console.log('Le serveur tourne sur le port: ' + port)
-})
-
-app.get('/register', ensureNotAuthenticated, function(request, response) {
-=======
 app.listen(port, function () {
   console.log('Le serveur tourne sur le port: ' + port)
 })
 
 app.get('/register', ensureNotAuthenticated, function (request, response) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
   response.render('register.ejs')
 });
 
@@ -173,23 +134,12 @@ function capital_letter(str) {
   return str.join(" ");
 }
 
-<<<<<<< HEAD
-console.log(capital_letter("Write a JavaScript program to capitalize the first letter of each word of a given string."));
-
-app.post('/register', function(req, res) {
-
-  if (req.body.firstname && req.body.lastname && req.body.email && req.body.password && req.body.confirmPwd && req.body.gender && req.body.city) {
-    if (req.body.password == req.body.confirmPwd) {
-      bcrypt.genSalt(10, function(err, salt) {
-        bcrypt.hash(req.body.password, salt, function(err, hash) {
-=======
 app.post('/register', function (req, res) {
 
   if (req.body.firstname && req.body.lastname && req.body.email && req.body.password && req.body.confirmPwd && req.body.gender && req.body.city) {
     if (req.body.password == req.body.confirmPwd) {
       bcrypt.genSalt(10, function (err, salt) {
         bcrypt.hash(req.body.password, salt, function (err, hash) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
           var newUser = new UserModel({
             id: Date.now().toString(),
             firstName: capital_letter(req.body.firstname),
@@ -201,13 +151,7 @@ app.post('/register', function (req, res) {
             city: capital_letter(req.body.city),
             birthdate: req.body.birthdate
           });
-<<<<<<< HEAD
-          console.log(req.body)
-          console.log(newUser)
-          newUser.save(function(err) {
-=======
           newUser.save(function (err) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
 
             if (!err) {
               req.flash('success_msg', 'Vous êtes maintenant enregistré, vous pouvez vous identifier.')
@@ -234,11 +178,7 @@ app.post('/register', function (req, res) {
   }
 });
 
-<<<<<<< HEAD
-app.get('/', ensureNotAuthenticated, function(request, response) {
-=======
 app.get('/', ensureNotAuthenticated, function (request, response) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
   response.render('index.ejs')
 });
 
@@ -248,11 +188,7 @@ app.post("/", passport.authenticate("local", {
   failureFlash: true
 }));
 
-<<<<<<< HEAD
-app.get('/home', ensureAuthenticated, function(request, response) {
-=======
 app.get('/home', ensureAuthenticated, function (request, response) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
   response.render('home.ejs', {
     id: request.user.id,
     firstname: request.user.firstName,
@@ -270,11 +206,7 @@ app.get('/home', ensureAuthenticated, function (request, response) {
 
 });
 
-<<<<<<< HEAD
-app.post('/home', function(req, res) {
-=======
 app.post('/home', function (req, res) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
 
   if (req.body.post) {
     var newPost = new PostModel({
@@ -284,13 +216,8 @@ app.post('/home', function (req, res) {
       post: req.body.post,
       userId: "111111122222"
     });
-    console.log(req.body)
-    console.log(newPost)
-<<<<<<< HEAD
-    newPost.save(function(err) {
-=======
+
     newPost.save(function (err) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
       if (!err) {
         req.flash('success_msg', 'Envoyé!')
         res.redirect('/home')
@@ -309,26 +236,16 @@ app.post('/home', function (req, res) {
   }
 });
 
-<<<<<<< HEAD
-app.get('/logout', function(request, response) {
-=======
 app.get('/logout', function (request, response) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
   request.logout();
   request.flash('sucess_msg', 'A plus tard!')
   response.redirect('/')
 
 });
 
-<<<<<<< HEAD
-app.post('/updateProfile', function(req, res) {
-
-  upload(req, res, function(err) {
-=======
 app.post('/confirmProfile', function (req, res) {
 
   upload(req, res, function (err) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
     if (err) {
       req.flash('error_msg', 'Une erreur est survenue. Vérifiez l\'extension du fichier.')
       res.redirect('/home')
@@ -339,17 +256,9 @@ app.post('/confirmProfile', function (req, res) {
 
             var id = req.user._id
 
-<<<<<<< HEAD
-
-
-            UserModel.findOne({
-              _id: id
-            }, function(err, foundObject) {
-=======
             UserModel.findOne({
               _id: id
             }, function (err, foundObject) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
               if (err) {
                 req.flash('error_msg', 'Une erreur est survenue.')
                 res.redirect('/home')
@@ -359,15 +268,6 @@ app.post('/confirmProfile', function (req, res) {
                   req.flash('error_msg', 'Objet non trouvé..')
                   res.redirect('/home')
                 } else {
-<<<<<<< HEAD
-                  foundObject.alias = req.body.pseudo
-                  foundObject.description = req.body.description
-                  foundObject.profilePictureURL = "../uploads/" + req.file.filename
-                  foundObject.isCompleted = true
-                  console.log(req.file)
-
-                  foundObject.save(function(err, updatedObject) {
-=======
                   trimmedAlias = req.body.pseudo
                   foundObject.alias = trimmedAlias.replace(/\s/g, "")
                   foundObject.description = req.body.description
@@ -376,7 +276,6 @@ app.post('/confirmProfile', function (req, res) {
                   foundObject.lastUpdated = Date.now()
 
                   foundObject.save(function (err, updatedObject) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
                     if (err) {
                       req.flash('error_msg', 'Une erreur est survenue lors de l\'enregistrement. Veuillez recommencer.')
                       res.redirect('/home')
@@ -409,25 +308,15 @@ app.post('/confirmProfile', function (req, res) {
 // Profil utilisateur
 
 
-<<<<<<< HEAD
-app.get("/profile/:id", function (req, res) {
-  UserModel.findById(req.params.id, function (err, foundUser){
-=======
 app.get("/profile/:id", ensureAuthenticated, function (req, res) {
   UserModel.findById(req.params.id, function (err, foundUser) {
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
     if (err) {
       console.log(err)
       req.flash('error_msg', 'Utilisateur non trouvé.')
       res.redirect('/home')
       return
     }
-<<<<<<< HEAD
-    res.render('profile.ejs', {user: foundUser})
-  })
-})
-=======
-    console.log(req.session.passport.user)
+
     res.render('profile.ejs', { user: foundUser, req: req })
   })
 })
@@ -440,6 +329,7 @@ app.post("/updateProfile", function (req, res) {
       res.redirect('/home')
     } else {
       var id = req.user._id
+
       UserModel.findOne({
         _id: id
       }, function (err, foundObject) {
@@ -460,11 +350,6 @@ app.post("/updateProfile", function (req, res) {
               str += "Photo de profil  "
             }
 
-            if (req.body.updateCountry) {
-              foundObject.country = req.body.updateCountry.trim()
-              str += "Pays "
-            }
-
             if (req.body.updateCity) {
               foundObject.city = req.body.updateCity.trim()
               str += "Ville "
@@ -476,24 +361,22 @@ app.post("/updateProfile", function (req, res) {
             }
 
             if (req.body.updatePassword == req.body.updatePasswordConfirmation) {
-              bcrypt.genSalt(10, function (err, salt) {
-                bcrypt.hash(req.body.updatePassword, salt, function (err, hash) {
-                  console.log(hash)
-                  foundObject.password = hash
-                  str += "Mot de passe "
-                })
-              })
+
+              const password = req.body.updatePassword
+              const saltRounds = 10;
+              const hashedPassword = bcrypt.hashSync(password, saltRounds);
+
+              foundObject.password = hashedPassword
+              str += "Mot de passe "
             }
 
             foundObject.lastUpdated = new Date()
-            console.log(foundObject)
 
             foundObject.save(function (err, updatedObject) {
               if (err) {
                 req.flash('error_msg', 'Une erreur est survenue lors de l\'enregistrement. Veuillez recommencer.')
                 res.redirect('/home')
               } else {
-                console.log
                 req.flash('success_msg', str)
                 res.redirect('/home')
               }
@@ -505,4 +388,3 @@ app.post("/updateProfile", function (req, res) {
     }
   })
 });
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927

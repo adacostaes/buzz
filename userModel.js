@@ -51,13 +51,10 @@ const userSchema = new mongoose.Schema({
   isCompleted: {
     type: Boolean,
     default: false
-<<<<<<< HEAD
-=======
   },
   lastUpdated: {
     type: String,
     default: Date.now
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
   }
 })
 

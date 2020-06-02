@@ -9,23 +9,35 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/solid.css">
   <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
-<<<<<<< HEAD
-  <link rel="stylesheet" type="text/css" href="/public/css/home.css">
-=======
   <link rel="stylesheet" type="text/css" href="/css/profile.css">
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
 </head>
 
 <body>
+  <script>
+    function validation() {
+      var pwd = document.getElementById("updatePassword").value;
+      var confirmPwd = document.getElementById("updatePasswordConfirmation").value;
+
+      var msg = ""
+
+      if (pwd != confirmPwd) {
+        alert("Erreur: les mots de passes ne correspondent pas.");
+        return false;
+      } else {
+        if (pwd.match(/[0-9]/g) && pwd.match(/[A-Z]/g) && pwd.match(/[a-z]/g) && pwd.match(/[^a-zA-Z\d]/g) && str.length >= 8) {
+          document.getElementById("msg").innerHTML = "<p style='color:green'>Mot de passe fort.</p>"
+        } else {
+          document.getElementById("msg").innerHTML = "<p style='color:red'>Mot de passe trop faible. Au moins: 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial, 8 caractères de longueur.</p>"
+        }
+      }
+    }
+  </script>
   <% if (messages.error) { %>
   <%= messages.error %>
   <% } %>
   <nav class="navbar navbar-light bg-white">
-<<<<<<< HEAD
-    <a href="#" class="navbar-brand"> <img id="logo" src="medias/logo_header.png" alt="Logo"> <span id="logo-text"> BUZZZ </span></a>
-=======
-    <a href="/home" class="navbar-brand"> <img id="logo" src="/medias/logo_header.png" alt="Logo"> <span id="logo-text"> BUZZZ </span></a>
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
+    <a href="/home" class="navbar-brand"> <img id="logo" src="/medias/logo_header.png" alt="Logo"> <span id="logo-text">
+        BUZZZ </span></a>
     <a href="/logout"><button type="button" class="btn btn-default btn-sm">
         <span class="fas fa-sign-out-alt"></span> Se déconnecter
       </button>
@@ -42,25 +54,16 @@
       </div>
     </form>
   </nav>
-<<<<<<< HEAD
-  <div class="container">
-    <div class="page-header">
-=======
   <% if(req.session.passport.user == user.id) {%>
-    <script>
-      $(document).ready(function(){
-        $( "#click" ).click(function() {
-            $("#features").hide("slow", "swing");
-            $("#edit").show("slow","swing");
-          })
+  <script>
+    $(document).ready(function () {
+      $("#click").click(function () {
+        $("#features").hide("slow", "swing");
+        $("#edit").show("slow", "swing");
+      })
+    })
 
-          $( "#click2" ).click(function(){
-            $("#features").show("slow", "swing");
-            $("#edit").hide("slow","swing");
-          })
-        })
-
-    </script>
+  </script>
 
   <div class="container">
     <div class="page-header">
@@ -70,7 +73,8 @@
     <!--END page-header-->
     <div class="row" id="features">
       <div class="col-sm-4 feature">
-        <img style="width:300px;height:300px;border-radius:50%;" src="<%= user.profilePictureURL %>" alt="Web Design" class="img-circle">
+        <img style="width:300px;height:300px;border-radius:50%;" src="<%= user.profilePictureURL %>" alt="Web Design"
+          class="img-circle">
       </div>
       <!--END feature-->
 
@@ -79,40 +83,42 @@
           <div class="centered-text col-sm-offset-3 col-sm-6 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6">
             <div itemscope="" itemtype="http://schema.org/Person">
               <h2> <span itemprop="name"><%= user.firstName + ' ' + user.lastName%></span></h2>
-              <button id="click" type="submit" class="btn btn-sm btn-danger" name="loginButton" style="margin-bottom: 15px">Modifier mon profil</button>
-              
+              <button id="click" class="btn btn-sm btn-danger" name="loginButton" style="margin-bottom: 15px">Modifier
+                mon profil</button>
+
               <p><i class="fa fa-user" aria-hidden="true"></i><span> @<%= user.alias%></span></p>
-              <p><i class="fa fa-map-marker"></i> <span itemprop="addressRegion"><%= user.city + ', ' + user.country%></span></p>
+              <p><i class="fa fa-map-marker"></i> <span
+                  itemprop="addressRegion"><%= user.city + ', ' + user.country%></span></p>
               <p> <i class="fa fa-calendar"> </i> Membre depuis le <strong>
-                <%
+                  <%
                   var myDate = parseInt(user.createdOn, 10);
                   var date = new Date(myDate);
                   var fdate =  ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear()
                  %>
-                 <%= fdate %>
-               </strong> </p>
-               <p> <i class="fa fa-birthday-cake"> </i> Né(e) le <strong>
+                  <%= fdate %>
+                </strong> </p>
+              <p> <i class="fa fa-birthday-cake"> </i> Né(e) le <strong>
                   <%= user.birthdate %>
                 </strong> </p>
             </div>
           </div>
         </div>
 
-        </div>
-        <div class="col-sm-4 feature">
-          <br>
-          <h3>Biographie: </h3>
-          <br>
-          <%= user.description %>
-        </div>
       </div>
-      <!--END feature-->
+      <div class="col-sm-4 feature">
+        <br>
+        <h3>Biographie: </h3>
+        <br>
+        <%= user.description %>
+      </div>
     </div>
+    <!--END feature-->
   </div>
-<div class="container">
+  </div>
+  <div class="container">
     <div class="row" id="edit" style="display: none">
       <div class="col-sm-4 feature">
-        
+
       </div>
       <!--END feature-->
 
@@ -121,83 +127,91 @@
           <div class="centered-text col-sm-offset-3 col-sm-6 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6">
             <div itemscope="" itemtype="http://schema.org/Person">
               <!--FORM -->
-              <form name="updateProfileForm" role="form" enctype="multipart/form-data" method="post" action="/updateProfile">
+              <form name="updateProfileForm" role="form" enctype="multipart/form-data" method="post"
+                action="/updateProfile">
+
                 <div class="form-group">
-                  <img style="width:300px;height:300px;border-radius:50%;" src="<%= user.profilePictureURL %>" alt="Web Design" class="img-circle">
+                  <img style="width:300px;height:300px;border-radius:50%;" src="<%= user.profilePictureURL %>"
+                    alt="Web Design" class="img-circle">
                   <input type="file" name="photo">
                 </div>
-              <div class="row">
-                <div class="col-xs-6 col-sm-6 col-md-6">
-                  <div class="form-group">
-                    <%= user.firstName %>
+                <p id="msg">erzerzerzrzerzrz</p>
+                <div class="row">
+                  <div class="col-xs-6 col-sm-6 col-md-6">
+                    <div class="form-group">
+                      <%= user.firstName %>
+                    </div>
                   </div>
-                </div>
-                <div class="col-xs-6 col-sm-6 col-md-6">
-                  <div class="form-group">
-                    <%= user.lastName %>
+                  <div class="col-xs-6 col-sm-6 col-md-6">
+                    <div class="form-group">
+                      <%= user.lastName %>
+                    </div>
                   </div>
-                </div>
-              </div>
-  
-              <div class="form-group">
-                <%= user.email %>
-              </div>
-  
-              <div class="row">
-                <div class="col-xs-6 col-sm-6 col-md-6">
-                  <div class="form-group">
-                    <input type="password" name="password" id="updatePassword" class="form-control input-sm" placeholder="Mot de passe">
-                  </div>
-                </div>
-                <div class="col-xs-6 col-sm-6 col-md-6">
-                  <div class="form-group">
-                    <input type="password" name="confirmPwd" id="updatePasswordConfirmation" class="form-control input-sm" placeholder="Confirmation" onblur="validation()">
-                  </div>
-                </div>
-              </div>
-  
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <select name="updateCountry" id="country" class="form-control">
-                    <option value="" disabled>Pays</option>
-                    <option value="France" selected>France</option>
-                  </select>
-                </div>
-                <div class="form-group col-md-6">
-                  <input type="text" class="form-control" placeholder="Ville" name="updateCity" style="text-transform: capitalize;">
                 </div>
 
                 <div class="form-group">
-                  <label for="updateDescription">Biographie</label>
-                  <textarea name="updateDescription" id="" cols="35" rows="2"></textarea>
+                  <%= user.email %>
                 </div>
 
-  
-                <input type="submit" value="Mettre à jour mon profil" class="btn col-md-12">
-  
-            </form>
-            <!-- FIN FORM-->
+                <div class="row">
+                  <div class="col-xs-6 col-sm-6 col-md-6">
+                    <div class="form-group">
+                      <input type="password" name="updatePassword" id="updatePassword" class="form-control input-sm"
+                        placeholder="Mot de passe">
+                    </div>
+                  </div>
+                  <div class="col-xs-6 col-sm-6 col-md-6">
+                    <div class="form-group">
+                      <input type="password" name="updatePasswordConfirmation" id="updatePasswordConfirmation"
+                        class="form-control input-sm" placeholder="Confirmation" onblur="validation()">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <select name="updateCountry" id="country" class="form-control">
+                      <option value="" disabled>Pays</option>
+                      <option value="France" selected>France</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <input type="text" class="form-control" placeholder="Ville" name="updateCity"
+                      style="text-transform: capitalize;">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="updateDescription">Biographie</label>
+                    <br>
+                    <textarea name="updateDescription" id="" cols="50" rows="2"></textarea>
+                  </div>
+
+
+                  <input type="submit" value="Mettre à jour mon profil" class="btn col-md-12">
+
+              </form>
+              <!-- FIN FORM-->
 
             </div>
           </div>
         </div>
-        </div>
       </div>
-      <!--END feature-->
     </div>
+    <!--END feature-->
+  </div>
   </div>
   </div>
   <% } else { %>
-    <div class="container">
+  <div class="container">
     <div class="page-header">
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
       <h1>Vous êtes sur le profil de: </h1>
       <br><br>
     </div>
     <!--END page-header-->
     <div class="row" id="features">
       <div class="col-sm-4 feature">
-        <img style="width:300px;height:300px;border-radius:50%;" src="<%= user.profilePictureURL %>" alt="Web Design" class="img-circle">
+        <img style="width:300px;height:300px;border-radius:50%;" src="<%= user.profilePictureURL %>" alt="Web Design"
+          class="img-circle">
       </div>
       <!--END feature-->
 
@@ -207,16 +221,17 @@
             <div itemscope="" itemtype="http://schema.org/Person">
               <h2> <span itemprop="name"><%= user.firstName + ' ' + user.lastName%></span></h2> <br>
               <p><i class="fa fa-user" aria-hidden="true"></i><span> @<%= user.alias%></span></p>
-              <p><i class="fa fa-map-marker"></i> <span itemprop="addressRegion"><%= user.city + ', ' + user.country%></span></p>
+              <p><i class="fa fa-map-marker"></i> <span
+                  itemprop="addressRegion"><%= user.city + ', ' + user.country%></span></p>
               <p> <i class="fa fa-calendar"> </i> Membre depuis le <strong>
-                <%
+                  <%
                   var myDate = parseInt(user.createdOn, 10);
                   var date = new Date(myDate);
                   var fdate =  ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear()
                  %>
-                 <%= fdate %>
-               </strong> </p>
-               <p> <i class="fa fa-birthday-cake"> </i> Né(e) le <strong>
+                  <%= fdate %>
+                </strong> </p>
+              <p> <i class="fa fa-birthday-cake"> </i> Né(e) le <strong>
                   <%= user.birthdate %>
                 </strong> </p>
             </div>
@@ -232,23 +247,15 @@
             <div id="social-links" class=" col-lg-12">
               <div class="row">
                 <div class="col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder">
-<<<<<<< HEAD
-                  <a title="github" class="btn btn-social btn-block btn-github" target="_BLANK" href="http://github.com/yourid">
-                    <i class="fa fa-github"></i> /yourid
-                  </a>
-                </div>
-                <div class="col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder">
-                  <a title="stackoverflow" class="btn btn-social btn-block btn-stackoverflow" target="_BLANK" href="http://stackoverflow.com/users/youruserid/yourid">
-                    <i class="fa fa-stack-overflow"></i> /yourid
-=======
-                  <a title="Suivre" class="btn btn-social btn-block btn-github" target="_BLANK" href="http://github.com/yourid">
+                  <a title="Suivre" class="btn btn-social btn-block btn-github" target="_BLANK"
+                    href="http://github.com/yourid">
                     <i class="fas fa-user-plus"></i> Suivre
                   </a>
                 </div>
                 <div class="col-xs-6 col-sm-3 col-md-2 col-lg-3 social-btn-holder">
-                  <a title="Démarrer une discussion instantanée" class="btn btn-social btn-block btn-stackoverflow" target="_BLANK" href="http://stackoverflow.com/users/youruserid/yourid">
+                  <a title="Démarrer une discussion instantanée" class="btn btn-social btn-block btn-stackoverflow"
+                    target="_BLANK" href="http://stackoverflow.com/users/youruserid/yourid">
                     <i class="far fa-comments"></i> Démarrer une discussion instantanée
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
                   </a>
                 </div>
               </div>
@@ -260,10 +267,7 @@
     </div>
     <!--end features-->
   </div>
-<<<<<<< HEAD
-=======
   <%}%>
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
   <!--end container-->
 </body>
 </html>

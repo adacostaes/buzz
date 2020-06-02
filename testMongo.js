@@ -1,11 +1,6 @@
 var MongoClient = require('mongodb').MongoClient;
-<<<<<<< HEAD
 
 var url = "mongodb://localhost:27017/test";
-=======
-
-var url = "mongodb://localhost:27017/test";
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
 var myobj = { name: "Company Inc", address: "Highway 37" };
 
 var mybigobj = [
@@ -115,15 +110,9 @@ function addTable(tableName,collectionName) {
     db.close();
   });
 	}
-<<<<<<< HEAD
   
 MongoClient.connect(url, { useUnifiedTopology: true }, function(err, db) {
   
-=======
-  
-MongoClient.connect(url, { useUnifiedTopology: true }, function(err, db) {
-  
->>>>>>> 1bdde7b926a5a6c9170b63230b47ae26d1316927
 if (err) throw err;
 
 // addTable("","");
