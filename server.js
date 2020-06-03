@@ -364,6 +364,7 @@ app.post("/updateProfile", function (req, res) {
 
               const password = req.body.updatePassword
               const saltRounds = 10;
+              
               const hashedPassword = bcrypt.hashSync(password, saltRounds);
 
               foundObject.password = hashedPassword
