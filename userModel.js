@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+const friends = require("mongoose-friends")
 
 function toLower(str) {
   return str.toLowerCase();
@@ -58,5 +59,5 @@ const userSchema = new mongoose.Schema({
   }
 })
 
-var UserModel = mongoose.model('User', userSchema)
+var UserModel = mongoose.model('User', userSchema.plugin(friends()))
 module.exports = UserModel

@@ -14,6 +14,9 @@
 
 <body>
 
+  <script>
+  </script>
+
   <span id='latitude'></span>
   <span id='longitude'></span>
   <script src="scripts/meteo.js"></script>
@@ -29,16 +32,17 @@
     </a>
     <%- include ("./messages") %>
     <% if(isCompleted == true) {%>
-    <form class="form-inline">
-      <div class="input-group">
-        <input type="text" class="form-control" aria-label="Recipient's username" aria-describedby="button-addon2">
-        <div class="input-group-append">
+    <div>
+      <form class="form-inline my-0 my-lg-0">
+        <div class="input-group">
+          <input aria-label="search" onkeyup="" name="search" id="search" class="form-control" placeholder="Rechercher"
+            aria-label="Recipient's username" aria-describedby="button-addon2">
           <button class="btn btn-outline-warning" type="button" id="button-addon2">
             <i class="fa fa-search"></i>
           </button>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
     <% } %>
   </nav>
 
@@ -73,6 +77,18 @@
             </li>
             <li class="list-group-item">
               <div class="h6 text-muted">Mes Amis</div>
+              <ul>
+                <% var friendship;%>
+                <% for (var i = 0; i < friendships.length ; i++) { %>
+                <% friendship = friendships[i] %>
+                <li> <a href="/profile/<%= friendship.friend.id%>"><%= friendship.friend.firstName%> <%= friendship.friend.lastName%></a>
+                  <a title="Ne plus êtes ami"
+                    href="/removeFriend/<%= friendship.friend.id%>">
+                    <i class="fas fa-user-times"></i>
+                  </a>
+                </li>
+                <% } %>
+              </ul>
             </li>
             <li class="list-group-item"><%=city%>, <%=country%></li>
           </ul>

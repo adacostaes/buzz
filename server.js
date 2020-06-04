@@ -8,6 +8,7 @@ const passport = require('passport')
 const flash = require('express-flash');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+
 const {
   ensureAuthenticated
 } = require('./auth')
@@ -53,6 +54,8 @@ function checkFileType(file, callback) {
     callback('Erreur, le fichier n\'est pas une image.')
   }
 }
+
+
 
 var UserModel = require('./userModel')
 var PostModel = require('./postModel')
@@ -189,22 +192,35 @@ app.post("/", passport.authenticate("local", {
 }));
 
 app.get('/home', ensureAuthenticated, function (request, response) {
-  response.render('home.ejs', {
-    id: request.user.id,
-    firstname: request.user.firstName,
-    lastname: request.user.lastName,
-    email: request.user.email,
-    gender: request.user.gender,
-    country: request.user.country,
-    city: request.user.city,
-    birthdate: request.user.birthdate,
-    isCompleted: request.user.isCompleted,
-    alias: request.user.alias,
-    profilePictureURL: request.user.profilePictureURL,
-    description: request.user.description
+
+  var currentUser = request.user;
+
+  UserModel.getFriends(currentUser, function (err, friendships) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+
+      response.render('home.ejs', {
+        id: request.user.id,
+        firstname: request.user.firstName,
+        lastname: request.user.lastName,
+        email: request.user.email,
+        gender: request.user.gender,
+        country: request.user.country,
+        city: request.user.city,
+        birthdate: request.user.birthdate,
+        isCompleted: request.user.isCompleted,
+        alias: request.user.alias,
+        profilePictureURL: request.user.profilePictureURL,
+        description: request.user.description,
+        friendships: friendships
+      })
+    }
   })
 
-});
+})
+
 
 app.post('/home', function (req, res) {
 
@@ -309,15 +325,26 @@ app.post('/confirmProfile', function (req, res) {
 
 
 app.get("/profile/:id", ensureAuthenticated, function (req, res) {
+
+  var currentUser = req.user;
+
   UserModel.findById(req.params.id, function (err, foundUser) {
     if (err) {
       console.log(err)
       req.flash('error_msg', 'Utilisateur non trouvé.')
       res.redirect('/home')
       return
-    }
+    } else {
+      UserModel.getFriends(currentUser, function (err, friendships) {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          res.render('profile.ejs', { user: foundUser, req: req, friendship:friendships })
+        }
 
-    res.render('profile.ejs', { user: foundUser, req: req })
+      })
+    }
   })
 })
 
@@ -364,7 +391,7 @@ app.post("/updateProfile", function (req, res) {
 
               const password = req.body.updatePassword
               const saltRounds = 10;
-              
+
               const hashedPassword = bcrypt.hashSync(password, saltRounds);
 
               foundObject.password = hashedPassword
@@ -389,3 +416,36 @@ app.post("/updateProfile", function (req, res) {
     }
   })
 });
+
+app.get("/addAsFriend/:id", ensureAuthenticated, function (req, res) {
+
+  UserModel.requestFriend(req.user.id, req.params.id, function (err) {
+    if (err) {
+      console.log(err);
+    } else {
+      req.flash('success_msg', 'Vous venez d\'effectuer une demande d\'ami.')
+      res.redirect('/home')
+    }
+  });
+})
+
+app.get("/removeFriend/:id", ensureAuthenticated, function (req, res) {
+  var currentUser = req.user;
+  var conditions = { "_id": req.params.id };
+  UserModel.findOne(conditions)
+    .then(user => {
+      var friendUser = user;
+      // Friend remove
+      console.log(friendUser)
+      console.log(currentUser)
+      UserModel.removeFriend(currentUser, friendUser, (err, result) => {
+        if (err) {
+          res.send(500);
+        }
+        else {
+          req.flash('success_msg', 'Vous venez de retirer ' + friendUser.alias + ' de vos amis.')
+          res.redirect('/home')
+        }
+      });
+    })
+})
