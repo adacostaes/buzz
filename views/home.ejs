@@ -34,7 +34,7 @@
     <%- include ("./messages") %>
     <% if(isCompleted == true) {%>
     <div>
-      <form method="post" action="/search"class="form-inline my-0 my-lg-0">
+      <form method="post" action="/search" class="form-inline my-0 my-lg-0">
         <div class="input-group">
           <input aria-label="search" name="search" id="search" class="form-control" placeholder="Rechercher"
             aria-label="Recipient's username" aria-describedby="button-addon2">
@@ -160,15 +160,18 @@
         <!--- \\\\\\\Post-->
         <% posts.forEach(function(post) {
           var actualUser;
-          var affichage = true;
-          var affichage_friend = true;
+          var affichage = false;
+          var affichage_friend = false;
+          
           if (id == post.userId){
-            affichage =true }
-            else {
-              affichage = false;
-            }
+            affichage =true 
+          } 
+          else {
+            affichage = false;
+          }
 
           for (var i = 0; i < friendships.length ; i++) {
+
 
           if(friendships.find(friendships => friendships._id == post.userId)){
             affichage_friend = true;
@@ -180,8 +183,7 @@
             
           users.forEach(function(user) {
             if (user._id == post.userId){
-            actualUser = user; 
-            console.log(user)%>
+            actualUser = user%>
         <br />
         <div class="card gedf-card">
           <div class="card-header">
@@ -218,7 +220,7 @@
           </div>
         </div>
         <%}}) %>
-        <%}%>
+              <%}%>
               <% }); %>
 
               <!-- Post /////-->
