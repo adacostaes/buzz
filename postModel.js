@@ -14,6 +14,9 @@ const postSchema = new mongoose.Schema({
   post: {
     type: String
   },
+  postImage: {
+    type: String,
+  },
   userId: {
     type: String,
   },

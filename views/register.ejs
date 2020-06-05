@@ -13,11 +13,10 @@
   <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
   <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
-
+<% if (messages.error) { %>
+  <%= messages.error %>
+  <% } %>
 <body>
-  <% if (messages.error) { %>
-    <%= messages.error %>
-    <% } %>
   <script type="text/javascript">
     function surligne(champ, erreur) {
       if (erreur)

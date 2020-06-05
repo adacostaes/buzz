@@ -1,0 +1,99 @@
+<html>
+
+<head>
+  <title>Buzzz</title>
+  <link rel="icon" href="/medias/favicon.ico" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/solid.css">
+  <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+  <link rel="stylesheet" type="text/css" href="/css/profile.css">
+</head>
+
+<body>
+  <% if (messages.error) { %>
+  <%= messages.error %>
+  <% } %>
+  <nav class="navbar navbar-light bg-white">
+    <a href="/home" class="navbar-brand"> <img id="logo" src="/medias/logo_header.png" alt="Logo"> <span id="logo-text">
+        BUZZZ </span></a>
+    <a href="/logout"><button type="button" class="btn btn-default btn-sm">
+        <span class="fas fa-sign-out-alt"></span> Se déconnecter
+      </button>
+    </a>
+    <%- include ("./messages") %>
+    <div>
+      <form method="post" action="/search" class="form-inline my-0 my-lg-0">
+        <div class="input-group">
+          <input aria-label="search" name="search" id="search" class="form-control" placeholder="Rechercher"
+            aria-label="Recipient's username" aria-describedby="button-addon2">
+          <button class="btn btn-outline-warning" type="submit" id="button-addon2">
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="card gedf-card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="mr-2">
+              <img class="rounded-circle" width="45" height="45" src="<%=foundUser.profilePictureURL%>" alt="">
+            </div>
+            <div class="ml-2">
+              <div class="h5 m-0"><%= foundUser.firstName %>
+                <%= foundUser.lastName %>
+              </div>
+            </div>
+
+
+          </div>
+          <div>
+            <a href="/profile/<%= foundUser._id%>">
+              <button class="btn btn-warning float-right">Voir le
+                profil
+              </button>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <style>
+    footer {
+      background-color: black;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 35px;
+      text-align: center;
+      color: white;
+    }
+
+    footer a:link {
+      color: #fbc303;
+    }
+
+    footer a:visited {
+      color: #f68a0d;
+    }
+
+    footer p {
+      padding: 10.5px;
+      margin: 0px;
+      line-height: 100%;
+    }
+  </style>
+  <footer>
+    <p>© 2020<a href="#"> Buzzz </a>- Yazid MOUTAOUAKIL / Alexandre DA COSTA E SILVA - LPI-RIWS L3</p>
+  </footer>
+  <!--end container-->
+</body>
+
+</html>

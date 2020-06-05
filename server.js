@@ -7,6 +7,9 @@ const path = require('path')
 const passport = require('passport')
 const flash = require('express-flash');
 const session = require('express-session');
+const app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io').listen(server);
 const cookieParser = require('cookie-parser');
 
 const {
@@ -25,6 +28,12 @@ const storage = multer.diskStorage({
     callback(null, req.user.email + path.extname(file.originalname))
   }
 })
+const storagePostImage = multer.diskStorage({
+  destination: './imagesPost/',
+  filename: function (req, file, callback) {
+    callback(null, req.user.alias + Date.now().toString() + path.extname(file.originalname))
+  }
+})
 
 // Initialisation upload
 const upload = multer({
@@ -36,6 +45,16 @@ const upload = multer({
     checkFileType(file, callback);
   }
 }).single('photo')
+
+const uploadPostImage = multer({
+  storage: storagePostImage,
+  limits: {
+    filesize: 2000000
+  },
+  fileFilter: function (req, file, callback) {
+    checkFileType(file, callback);
+  }
+}).single('customFile')
 
 // Check extension image
 function checkFileType(file, callback) {
@@ -64,7 +83,6 @@ var LocalStrategy = require('passport-local').Strategy;
 
 var port = process.env.PORT || 5000
 
-const app = express()
 
 
 
@@ -93,6 +111,7 @@ app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, '/public')))
 
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+app.use('/imagesPost', express.static(path.join(__dirname, '/imagesPost')));
 
 app.use(cors())
 
@@ -119,7 +138,7 @@ mongoose
   .then(() => console.log('MongoDB connecté.'))
   .catch(err => console.log('Erreur: ' + err))
 
-app.listen(port, function () {
+server.listen(port, function () {
   console.log('Le serveur tourne sur le port: ' + port)
 })
 
@@ -137,7 +156,7 @@ function capital_letter(str) {
   return str.join(" ");
 }
 
-app.post('/register', function (req, res) {
+app.post('/register', ensureNotAuthenticated, function (req, res) {
 
   if (req.body.firstname && req.body.lastname && req.body.email && req.body.password && req.body.confirmPwd && req.body.gender && req.body.city) {
     if (req.body.password == req.body.confirmPwd) {
@@ -193,63 +212,133 @@ app.post("/", passport.authenticate("local", {
 
 app.get('/home', ensureAuthenticated, function (request, response) {
 
-  var currentUser = request.user;
+  PostModel.find({}).lean().sort({ createdOn: -1 }).exec(function (err, post) {
+    if (err) throw err;
+    UserModel.find({}).lean().exec(function (err2, result) {
+      if (err2) throw err2;
+      var currentUser = request.user;
 
-  UserModel.getFriends(currentUser, function (err, friendships) {
-    if (err) {
-      console.log(err);
-    }
-    else {
+      UserModel.getFriends(currentUser, function (err, friendships) {
+        if (err) {
+          console.log(err);
+        }
+        else {
 
-      response.render('home.ejs', {
-        id: request.user.id,
-        firstname: request.user.firstName,
-        lastname: request.user.lastName,
-        email: request.user.email,
-        gender: request.user.gender,
-        country: request.user.country,
-        city: request.user.city,
-        birthdate: request.user.birthdate,
-        isCompleted: request.user.isCompleted,
-        alias: request.user.alias,
-        profilePictureURL: request.user.profilePictureURL,
-        description: request.user.description,
-        friendships: friendships
-      })
-    }
-  })
-
-})
-
-
-app.post('/home', function (req, res) {
-
-  if (req.body.post) {
-    var newPost = new PostModel({
-      id: Date.now().toString(),
-      firstName: "Yazid",
-      lastName: "Mtkl",
-      post: req.body.post,
-      userId: "111111122222"
+          response.render('home.ejs', {
+            id: request.user.id,
+            firstname: request.user.firstName,
+            lastname: request.user.lastName,
+            email: request.user.email,
+            gender: request.user.gender,
+            country: request.user.country,
+            city: request.user.city,
+            birthdate: request.user.birthdate,
+            isCompleted: request.user.isCompleted,
+            alias: request.user.alias,
+            profilePictureURL: request.user.profilePictureURL,
+            description: request.user.description,
+            friendships: friendships,
+            posts: post,
+            users: result
+          });
+        }
+      });
     });
+  });
+});
 
-    newPost.save(function (err) {
-      if (!err) {
-        req.flash('success_msg', 'Envoyé!')
-        res.redirect('/home')
-      } else {
-        if (err.name == 'ValidationError') {
-          req.flash('error_msg', 'Mauvaise requête.')
+app.post('/home', ensureAuthenticated, function (req, res) {
+
+  uploadPostImage(req, res, function (err) {
+    if (err) {
+      req.flash('error_msg', 'Une erreur est survenue. Vérifiez l\'extension du fichier.')
+      res.redirect('/home')
+    } else if (req.file) {
+
+      var newPostImage = new PostModel({
+        id: Date.now().toString(),
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        postImage: "../imagesPost/" + req.file.filename,
+        userId: req.user.id
+      });
+      newPostImage.save(function (err) {
+        if (!err) {
+          req.flash('success_msg', 'Envoyé!')
           res.redirect('/home')
         } else {
-          req.flash('error_msg', 'Erreur interne.')
-          res.redirect('/')
+          if (err.name == 'ValidationError') {
+            req.flash('error_msg', 'Mauvaise requête.')
+            res.redirect('/home')
+          } else {
+            req.flash('error_msg', 'Erreur interne.')
+            res.redirect('/')
+          }
         }
-      }
-    });
-  } else {
+      });
+    } else if (req.body.post && !req.file) {
+
+      var newPost = new PostModel({
+        id: Date.now().toString(),
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        post: req.body.post,
+        userId: req.user.id
+      });
+      newPost.save(function (err) {
+        if (!err) {
+          req.flash('success_msg', 'Envoyé!')
+          res.redirect('/home')
+        } else {
+          if (err.name == 'ValidationError') {
+            req.flash('error_msg', 'Mauvaise requête.')
+            res.redirect('/home')
+          } else {
+            req.flash('error_msg', 'Erreur interne.')
+            res.redirect('/')
+          }
+        }
+      });
+    }
+  });/*else {
     res.send('Votre message est vide.')
+  }*/
+});
+
+aliasConnected = [];
+
+io.on('connection', function (socket) {
+
+  socket.on('new user', function (data, callback) {
+
+    if (aliasConnected.indexOf(data) != -1) {
+      callback(false);
+    } else {
+      callback(true);
+      socket.usernameConnected = data;
+      aliasConnected.push(socket.usernameConnected);
+      socket.emit('usernames', aliasConnected);
+    }
+
+    //socket.broadcast.emit("send message", data);
+  });
+
+  function updateAlias() {
+    socket.emit('usernames', aliasConnected);
   }
+
+  socket.on('send message', function (data) {
+    socket.broadcast.emit("send message", data);
+    socket.emit("send message", data);
+  });
+
+  socket.on('disconnect', function (data) {
+    if (socket.usernameConnected) return;
+    aliasConnected.splice(aliasConnected.indexOf(socket.uesernameConnected), 1);
+    updateAlias();
+  });
+
+
 });
 
 app.get('/logout', function (request, response) {
@@ -259,7 +348,7 @@ app.get('/logout', function (request, response) {
 
 });
 
-app.post('/confirmProfile', function (req, res) {
+app.post('/confirmProfile', ensureAuthenticated, function (req, res) {
 
   upload(req, res, function (err) {
     if (err) {
@@ -340,7 +429,7 @@ app.get("/profile/:id", ensureAuthenticated, function (req, res) {
           console.log(err);
         }
         else {
-          res.render('profile.ejs', { user: foundUser, req: req, friendship:friendships })
+          res.render('profile.ejs', { user: foundUser, req: req, friendship: friendships })
         }
 
       })
@@ -348,7 +437,7 @@ app.get("/profile/:id", ensureAuthenticated, function (req, res) {
   })
 })
 
-app.post("/updateProfile", function (req, res) {
+app.post("/updateProfile", ensureAuthenticated, function (req, res) {
 
   upload(req, res, function (err) {
     if (err) {
@@ -387,15 +476,17 @@ app.post("/updateProfile", function (req, res) {
               str += "Description "
             }
 
-            if (req.body.updatePassword == req.body.updatePasswordConfirmation) {
+            if (req.body.updatePassword != "" && req.body.updatePasswordConfirmation != "") {
+              if (req.body.updatePassword == req.body.updatePasswordConfirmation) {
 
-              const password = req.body.updatePassword
-              const saltRounds = 10;
+                const password = req.body.updatePassword
+                const saltRounds = 10;
 
-              const hashedPassword = bcrypt.hashSync(password, saltRounds);
+                const hashedPassword = bcrypt.hashSync(password, saltRounds);
 
-              foundObject.password = hashedPassword
-              str += "Mot de passe "
+                foundObject.password = hashedPassword
+                str += "Mot de passe "
+              }
             }
 
             foundObject.lastUpdated = new Date()
@@ -449,3 +540,25 @@ app.get("/removeFriend/:id", ensureAuthenticated, function (req, res) {
       });
     })
 })
+
+app.post("/search", ensureAuthenticated, function (req, res) {
+
+  if (req.body.search) {
+
+    searchedUser = req.body.search
+    var conditions = { "alias": searchedUser };
+
+    UserModel.findOne(conditions).exec(function (err, foundUser) {
+      if (err){
+        console.log(err)
+      } else if (!foundUser) {
+        req.flash('error_msg', 'L\'utilisateur '+ searchedUser +' n\'éxiste pas.')
+        res.redirect('/home')
+      }
+      res.render('search.ejs', { foundUser: foundUser })
+    });
+  } else {
+    req.flash('error_msg', 'Vous n\'avez pas remplit le champ de recherche.')
+    res.redirect('/home')
+  }
+});

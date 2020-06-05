@@ -8,6 +8,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/solid.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
   <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
   <link rel="stylesheet" type="text/css" href="../public/css/home.css">
 </head>
@@ -33,11 +34,11 @@
     <%- include ("./messages") %>
     <% if(isCompleted == true) {%>
     <div>
-      <form class="form-inline my-0 my-lg-0">
+      <form method="post" action="/search"class="form-inline my-0 my-lg-0">
         <div class="input-group">
-          <input aria-label="search" onkeyup="" name="search" id="search" class="form-control" placeholder="Rechercher"
+          <input aria-label="search" name="search" id="search" class="form-control" placeholder="Rechercher"
             aria-label="Recipient's username" aria-describedby="button-addon2">
-          <button class="btn btn-outline-warning" type="button" id="button-addon2">
+          <button class="btn btn-outline-warning" type="submit" id="button-addon2">
             <i class="fa fa-search"></i>
           </button>
         </div>
@@ -79,15 +80,16 @@
               <div class="h6 text-muted">Mes Amis</div>
               <ul>
                 <% var friendship;%>
-                <% for (var i = 0; i < friendships.length ; i++) { %>
+
+                <% if (!friendships =="" ) {for (var i = 0; i < friendships.length ; i++) { %>
                 <% friendship = friendships[i] %>
-                <li> <a href="/profile/<%= friendship.friend.id%>"><%= friendship.friend.firstName%> <%= friendship.friend.lastName%></a>
-                  <a title="Ne plus êtes ami"
-                    href="/removeFriend/<%= friendship.friend.id%>">
+                <li> <a href="/profile/<%= friendship.friend.id%>"><%= friendship.friend.firstName%>
+                    <%= friendship.friend.lastName%></a>
+                  <a title="Ne plus êtes ami" href="/removeFriend/<%= friendship.friend.id%>">
                     <i class="fas fa-user-times"></i>
                   </a>
                 </li>
-                <% } %>
+                <% }} %>
               </ul>
             </li>
             <li class="list-group-item"><%=city%>, <%=country%></li>
@@ -97,6 +99,10 @@
             <div id="weather">
               <li class="list-group-item">
                 <button id="location-button" type="submit" class="btn btn-warning">Voir la météo</button>
+              </li>
+            </div>
+            <div id="weather2">
+              <li class="list-group-item">
               </li>
             </div>
           </ul>
@@ -121,7 +127,7 @@
           </div>
           <div class="card-body">
 
-            <form role="form" method="post" action="/home">
+            <form role="form" enctype="multipart/form-data" method="post" action="/home">
               <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
                   <div class="form-group">
@@ -134,7 +140,7 @@
                 <div class="tab-pane fade" id="images" role="tabpanel" aria-labelledby="images-tab">
                   <div class="form-group">
                     <div class="custom-file">
-                      <input type="file" class="custom-file-input" id="customFile">
+                      <input type="file" enctype="multipart/form-data" class="custom-file-input" name="customFile">
                       <label class="custom-file-label" for="customFile">Parcourir</label>
                     </div>
                   </div>
@@ -146,77 +152,166 @@
                   <input type="submit" class="btn btn-warning" value="Publier">
                 </div>
               </div>
-              <form />
+            </form>
           </div>
         </div>
         <!-- Post /////-->
 
         <!--- \\\\\\\Post-->
+        <% posts.forEach(function(post) {
+          var actualUser;
+          var affichage = true;
+          var affichage_friend = true;
+          if (id == post.userId){
+            affichage =true }
+            else {
+              affichage = false;
+            }
+
+          for (var i = 0; i < friendships.length ; i++) {
+
+          if(friendships.find(friendships => friendships._id == post.userId)){
+            affichage_friend = true;
+          } else {
+            affichage_friend = false;
+          }
+        }
+          if (affichage || affichage_friend) {
+            
+          users.forEach(function(user) {
+            if (user._id == post.userId){
+            actualUser = user; 
+            console.log(user)%>
+        <br />
         <div class="card gedf-card">
           <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
               <div class="d-flex justify-content-between align-items-center">
                 <div class="mr-2">
-                  <img class="rounded-circle" width="45" src="https://picsum.photos/50/50" alt="">
+                  <img class="rounded-circle" width="45" height="45" src="<%=actualUser.profilePictureURL%>" alt="">
                 </div>
                 <div class="ml-2">
-                  <div class="h5 m-0">@Yazid</div>
-                  <div class="h7 text-muted">Miracles Lee Cross</div>
+                  <div class="h5 m-0"><a href="/profile/<%= actualUser._id%>"><%= actualUser.firstName %>
+                      <%= actualUser.lastName %></a></div>
                 </div>
               </div>
               <div>
-                <div class="dropdown">
-                  <button class="btn btn-link dropdown-toggle" type="button" id="gedf-drop1" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">
-                    <i class="fa fa-ellipsis-h"></i>
-                  </button>
-                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="gedf-drop1">
-                    <div class="h6 dropdown-header">Configuration</div>
-                    <a class="dropdown-item" href="#">Delete</a>
-                    <a class="dropdown-item" href="#">Hide</a>
-                  </div>
-                </div>
               </div>
             </div>
 
           </div>
           <div class="card-body">
-            <div class="text-muted h7 mb-2"> <i class="fa fa-clock-o"></i>10 min ago</div>
+            <div class="text-muted h7 mb-2"> <i class="far fa-clock"></i>
+              <%
+              var myDate = parseInt(post.createdOn, 10);
+              var date = new Date(myDate);
+              var fdate =  ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear()
+              %>
+              <%= fdate %></div>
 
             <p class="card-text">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo recusandae nulla rem eos ipsa praesentium
-              esse magnam nemo dolor
-              sequi fuga quia quaerat cum, obcaecati hic, molestias minima iste voluptates.
+              <% if(post.post) { %>
+              <%= post.post %><% }else if (post.postImage){%>
+              <img width="600" height="600" src="<%= post.postImage %>" alt="">
+              <%}%>
             </p>
           </div>
         </div>
-        <!-- Post /////-->
+        <%}}) %>
+        <%}%>
+              <% }); %>
+
+              <!-- Post /////-->
 
 
-
-      </div>
-      <div class="col-md-3">
-        <div class="card gedf-card">
-          <div class="card-body">
-            <h5 class="card-title">Messagerie</h5>
-            <div class="card-subtitle mb-2 text-muted" is="messsagerie">Vous n'avez pas de message.</div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <%} else {%>
-  <%- include("modal.ejs") %>
-  <% } %>
+          <div class="col-md-3">
+            <div class="card gedf-card">
+              <div class="card-body">
+                <h5 class="card-title">Messagerie</h5>
+                <div class="card-subtitle mb-2 text-muted" is="messsagerie">Vous n'avez pas de message.</div>
+                <div class="card-subtitle mb-2 text-muted" is="messsagerie">
+                  <ul id="connectedFriends"> </ul>
+                </div>
+                <div class="container">
+                  <div class="list" id="chat"> </div>
 
 
+                  <label for="messageToSend">Votre message :</label>
+                  <input type="text" class="input-group-text" id="messageToSend"></input>
+                  <br />
+                  <input type="button" class="btn btn-info" value="envoyer" id="submit-message"></input>
 
-
-
-
-
-
-
+                </div>
+              </div>
+            </div>
+          </div>
+          <%} else {%>
+          <%- include("modal.ejs") %>
+          <% } %>
+          <div style="height:50">&nbsp;</div>
 </body>
+<script>
+  jQuery(function ($) {
+    var socket = io.connect();
+    var $messageSubmit = $("#submit-message");
+    var $messageBox = $("#messageToSend");
+    var $chat = $("#chat");
+    var $friendsConnected = $("#connectedFriends");
+
+    socket.emit('new user', '<%=alias %>', function (data) {
+      if (data) {
+        console.log("deja connecté");
+      }
+    });
+
+    socket.on("usernames", function (data) {
+      var html = '';
+      for (var i = 0; i < data.length; i++) {
+        html += '<li>' + data[i] + '</li>'
+      }
+      $friendsConnected.append(html);
+    });
+
+    $messageSubmit.click(function () {
+      socket.emit('send message', $messageBox.val());
+      $messageBox.val('');
+    });
+
+    socket.on("send message", function (data) {
+      $chat.append(data + "<br/>");
+    });
+
+  });
+</script>
+<style>
+  footer {
+    background-color: black;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 35px;
+    text-align: center;
+    color: white;
+  }
+
+  footer a:link {
+    color: #fbc303;
+  }
+
+  footer a:visited {
+    color: #f68a0d;
+  }
+
+  footer p {
+    padding: 10.5px;
+    margin: 0px;
+    line-height: 100%;
+  }
+</style>
+<footer>
+  <p>© 2020<a href="#"> Buzzz </a>- Yazid MOUTAOUAKIL / Alexandre DA COSTA E SILVA - LPI-RIWS L3</p>
+</footer>
 
 </html>
